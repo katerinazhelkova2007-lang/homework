@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ДЗ: Линейные уравнения (7 класс)</title>
+<style>
+  :root{
+    --primary:#2563EB; /* Синий цвет для разнообразия */
+    --primary-hover:#1D4ED8;
+    --bg:#F3F4F6;
+    --card:#FFFFFF;
+    --text:#111827;
+    --muted:#6B7280;
+    --border:#E5E7EB;
+    --success:#059669;
+    --error:#DC2626;
+    --shadow:0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -1px rgba(0,0,0,.03);
+    --shadow-hover:0 10px 15px -3px rgba(0,0,0,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;padding:32px 16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .container{max-width:800px;margin:0 auto}
+  
+  .header{
+    text-align:center;margin-bottom:36px;
+    background: #fff; padding: 24px; border-radius: 16px; box-shadow: var(--shadow);
+  }
+  .header h1{font-size:28px;font-weight:800;color:var(--primary);letter-spacing:-.5px;margin-bottom:8px}
+  .header p{color:var(--muted);font-size:15px}
+  
+  .task-card{
+    background:var(--card);border-radius:16px;padding:24px 28px;margin-bottom:16px;
+    box-shadow:var(--shadow);border:1px solid var(--border);
+    transition:box-shadow .2s ease,transform .2s ease;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .task-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px)}
+  
+  .task-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .task-number{background:#E0E7FF;color:var(--primary);font-weight:700;padding:4px 12px;border-radius:20px;font-size:14px}
+  .task-level{font-weight:600;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+  
+  .task-content{font-size:22px; font-weight: 500; padding: 10px 0;}
+  .math{font-family:"Cambria Math","Times New Roman",serif;font-size:1.1em;white-space:nowrap; font-weight: 500;}
+  
+  .answer-section{
+    display:flex;align-items:center;gap:12px;background:#F9FAFB;
+    padding:12px 16px;border-radius:10px;border:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  .answer-label{font-weight:600;font-size:16px; color: var(--muted)}
+  .answer-input{
+    width:120px;padding:10px 12px;border:2px solid var(--border);
+    border-radius:8px;font-size:18px;font-family:inherit;text-align:center;
+    font-weight:700; transition: border-color 0.2s; color: var(--primary);
+  }
+  .answer-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+  
+  .check-btn{
+    background:var(--primary);color:#fff;border:none;padding:10px 24px;
+    border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;
+    transition:background .15s;font-family:inherit; margin-left: auto;
+  }
+  .check-btn:hover{background:var(--primary-hover)}
+  
+  .result{font-weight:600;font-size:14px;display:none; width: 100%; margin-top: 5px; text-align: center;}
+  .result.correct{color:var(--success);display:block}
+  .result.incorrect{color:var(--error);display:block}
+
+  @media (max-width: 600px) {
+    .answer-section { flex-direction: column; align-items: stretch; }
+    .answer-input { width: 100%; }
+    .check-btn { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Домашнее задание: Уравнения</h1>
+    <p>15 заданий от простого к сложному. Не забудь: при переносе через "=" знак меняется!</p>
+  </div>
+  <div id="tasks"></div>
+</div>
+
+<script>
+/* ===== База заданий ===== */
+const T = [];
+
+// Уровень 1: Простейшие (по типу А и Б)
+T.push({ lvl: "Уровень 1", text: '4x = 28', ans: '7' });
+T.push({ lvl: "Уровень 1", text: '−3x = 21', ans: '-7' });
+T.push({ lvl: "Уровень 1", text: '5x − 12,5 = 0', ans: '2.5' });
+T.push({ lvl: "Уровень 1", text: '1/4 x = 8', ans: '32' }); 
+T.push({ lvl: "Уровень 1", text: '7x = −1,4', ans: '-0.2' });
+
+// Уровень 2: С иксами с двух сторон (по типу В)
+T.push({ lvl: "Уровень 2", text: '3x − 0,6 = x + 4,4', ans: '2.5' });
+T.push({ lvl: "Уровень 2", text: '5x + 2 = 7x − 10', ans: '6' });
+T.push({ lvl: "Уровень 2", text: '−2x + 9 = 4x − 3', ans: '2' });
+T.push({ lvl: "Уровень 2", text: '1,2x + 6 = 0,8x − 2', ans: '-20' }); // Осторожно с делением
+
+// Уровень 3: Со скобками (по типу Г)
+T.push({ lvl: "Уровень 3", text: '4x − (7x − 2) = 17', ans: '-5' });
+T.push({ lvl: "Уровень 3", text: '3(x − 2) = 5x + 4', ans: '-5' });
+T.push({ lvl: "Уровень 3", text: '−2(x + 3) = 4x − 6', ans: '0' });
+T.push({ lvl: "Уровень 3", text: '5(x − 1) = 2x + 10', ans: '5' });
+
+// Уровень 4: Комбинированные (Сложнее)
+T.push({ lvl: "Уровень 4", text: '2(3x − 1) − 4 = 3(x + 2) + 5', ans: '17/3 (или ≈5.67)' }); // Переделаем на целые, чтобы не мучить
+// Заменяем 14 на целое: 3(x+2) - 5 = 2(3x-1) -> 3x+6-5 = 6x-2 -> 3x+1 = 6x-2 -> 3 = 3x -> x=1
+T[13] = { lvl: "Уровень 4", text: '3(x + 2) − 5 = 2(3x − 1)', ans: '1' };
+T.push({ lvl: "Уровень 4", text: '4(2x − 3) + 5 = 3(3x − 2) − 4x', ans: '0.2' }); 
+
+/* ===== Рендер ===== */
+const root = document.getElementById('tasks');
+
+T.forEach((t, i) => {
+  const card = document.createElement('div');
+  card.className = 'task-card';
+
+  // Форматируем текст, чтобы дробь 1/4 выглядела красиво (просто для этого задания)
+  let displayText = t.text;
+  if(t.text.includes('1/4')) {
+      displayText = '&frac14;x = 8';
+  }
+
+  let head = `
+    <div class="task-header">
+      <span class="task-number">Задание ${i + 1}</span>
+      <span class="task-level">${t.lvl}</span>
+    </div>`;
+
+  let body = `<div class="task-content">
+      <span class="math">${displayText}</span>
+    </div>`;
+
+  const foot = `
+    <div class="answer-section">
+      <span class="answer-label">x =</span>
+      <input type="text" class="answer-input" id="ans${i}" placeholder="...">
+      <button class="check-btn" onclick="check(${i}, '${t.ans}')">Проверить</button>
+      <span class="result" id="res${i}"></span>
+    </div>`;
+
+  card.innerHTML = head + body + foot;
+  root.appendChild(card);
+});
+
+/* ===== Проверка ответов ===== */
+function check(i, correct) {
+  const input = document.getElementById('ans' + i);
+  const result = document.getElementById('res' + i);
+  let val = input.value.trim().replace(',', '.').replace(' ', ''); 
+  let cor = correct.replace(',', '.');
+
+  if (!val) {
+    result.className = 'result incorrect';
+    result.textContent = 'Введите ответ!';
+    return;
+  }
+
+  // Сравниваем как числа
+  if (parseFloat(val) === parseFloat(cor)) {
+    result.className = 'result correct';
+    result.textContent = '✓ Абсолютно верно!';
+    input.style.borderColor = 'var(--success)';
+  } else {
+    result.className = 'result incorrect';
+    result.textContent = '✗ Ошибка. Проверь знаки при переносе.';
+    input.style.borderColor = 'var(--error)';
+  }
+}
+</script>
+</body>
+</html>
